@@ -232,22 +232,37 @@ macro(build_library lib)
     )
 
     foreach(file ${ARG_INSTALL_HEADERS})
-      get_filename_component(_dir ${file} DIRECTORY)
+      set(INSTALL_DESTINATION_ROOT ${CMAKE_INSTALL_INCLUDEDIR}/${ARG_INSTALL_ROOT_DIR})
+      set(tmp_file ${file})
+      set(FOLDER_STACK)
 
-      if (_dir)
-        get_filename_component(dir ${_dir} NAME)
-        if ("${dir}" STREQUAL src)
-          set(dir "")
+      # Limit max depth of search to 5 subfolders
+      foreach (time 1 2 3 4 5)
+        get_filename_component(_path ${tmp_file} PATH)
+        if (_path)
+          get_filename_component(dir ${_path} NAME)
+
+          if ("${dir}" STREQUAL src)
+            set(dir "")
+            break()
+          endif()
+
+          if ("${dir}" STREQUAL includes)
+            set(dir "")
+            break()
+          endif()
+
+          list(INSERT FOLDER_STACK 0
+            ${dir}
+          )
+
+          set(tmp_file ${_path})
         endif()
-        if ("${dir}" STREQUAL includes)
-          set(dir "")
-        endif()
-        if ("${dir}" STREQUAL ${ARG_HEADER_ROOT_DIR})
-          set(dir "")
-        endif()
-      else()
-        set(dir "")
-      endif()
+      endforeach()
+
+      foreach(folder ${FOLDER_STACK})
+        set(INSTALL_DESTINATION_ROOT ${INSTALL_DESTINATION_ROOT}/${folder})
+      endforeach()
 
       set(COMPONENT ${ARG_COMPONENT})
       if (NOT ARG_NO_DEV)
@@ -255,7 +270,7 @@ macro(build_library lib)
       endif()
       install(
         FILES ${file}
-        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${ARG_HEADER_ROOT_DIR}/${dir}
+        DESTINATION ${INSTALL_DESTINATION_ROOT}
         COMPONENT ${COMPONENT}
       )
     endforeach()
