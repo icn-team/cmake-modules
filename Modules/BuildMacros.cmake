@@ -232,7 +232,7 @@ macro(build_library lib)
     )
 
     foreach(file ${ARG_INSTALL_HEADERS})
-      set(INSTALL_DESTINATION_ROOT ${CMAKE_INSTALL_INCLUDEDIR}/${ARG_INSTALL_ROOT_DIR})
+      set(INSTALL_DESTINATION_ROOT ${CMAKE_INSTALL_INCLUDEDIR}/${ARG_HEADER_ROOT_DIR})
       set(tmp_file ${file})
       set(FOLDER_STACK)
 
@@ -248,6 +248,11 @@ macro(build_library lib)
           endif()
 
           if ("${dir}" STREQUAL includes)
+            set(dir "")
+            break()
+          endif()
+
+          if ("${dir}" STREQUAL ${ARG_HEADER_ROOT_DIR})
             set(dir "")
             break()
           endif()
