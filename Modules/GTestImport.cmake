@@ -35,6 +35,8 @@ set(GTEST_INCLUDE_DIRS ${source_dir}/googlemock/include ${source_dir}/googletest
 set(GTEST_LIBRARIES ${binary_dir}/lib/libgmock_main.a ${binary_dir}/lib/libgmock.a ${binary_dir}/lib/libgtest_main.a ${binary_dir}/lib/libgtest.a)
 
 macro(add_test_internal test)
+  set_property(TARGET ${test}-bin PROPERTY CXX_STANDARD 17)
+
   if(${CMAKE_VERSION} VERSION_GREATER "3.10.0")
     gtest_discover_tests(${test}-bin TEST_PREFIX new:)
   else()
