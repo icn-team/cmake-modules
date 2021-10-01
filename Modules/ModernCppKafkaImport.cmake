@@ -18,8 +18,8 @@ include(FetchContent)
 
 FetchContent_Declare(
   modernCppKafka
-  GIT_REPOSITORY https://github.com/eloparco/modern-cpp-kafka.git
-  GIT_TAG feature/scram-support
+  GIT_REPOSITORY https://github.com/morganstanley/modern-cpp-kafka.git
+  GIT_TAG v2021.08.25
   CONFIGURE_COMMAND  ""
   BUILD_COMMAND ""
   INSTALL_COMMAND ""
