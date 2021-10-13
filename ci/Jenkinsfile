@@ -1,0 +1,58 @@
+library(
+  identifier: 'espressoJenkinsSharedLibrary@master',
+  retriever: modernSCM ([
+    $class: 'GitSCMSource',
+    remote: 'https://bitbucket-eng-gpk1.cisco.com/bitbucket/scm/ngl/pipelines.git',
+    credentialsId: 'bitbucket-token'
+  ])
+)
+
+/* groovylint-disable-next-line CompileStatic */
+pipeline {
+  agent {
+    docker {
+      image constants.getDockerImage()
+      alwaysPull true
+      label 'docker'
+      args constants.getDockerCmdString()
+      registryUrl constants.dockerHubRegistry()
+      registryCredentialsId constants.dockerHubRegistryCreds()
+      reuseNode true
+    }
+  }
+
+  stages {
+    stage ('Common') {
+      steps {
+        script {
+          getCommon()
+        }
+      }
+    }
+
+    stage ('Prepare') {
+      steps {
+        script {
+          promoteLevel = promotion.promoteLevel()
+        }
+      }
+    }
+
+    stage ('Promote to Production') {
+      when {
+        allOf {
+          branch constants.defaultStableBranch()
+          expression {
+            !promoteLevel.isEmpty()
+          }
+        }
+      }
+      steps {
+        script {
+          promotion.releaseNewVersion(env.GIT_URL, promoteLevel)
+          updateJenkinsLibraryReference()
+        }
+      }
+    }
+  }
+}
