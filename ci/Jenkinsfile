@@ -41,7 +41,7 @@ pipeline {
     stage ('Promote to Production') {
       when {
         allOf {
-          branch constants.defaultStableBranch()
+          branch 'main'
           expression {
             !promoteLevel.isEmpty()
           }
