@@ -1,5 +1,5 @@
 library(
-  identifier: 'espressoJenkinsSharedLibrary@master',
+  identifier: 'espressoJenkinsSharedLibrary@tags/v1.3.2',
   retriever: modernSCM ([
     $class: 'GitSCMSource',
     remote: 'https://bitbucket-eng-gpk1.cisco.com/bitbucket/scm/ngl/pipelines.git',
