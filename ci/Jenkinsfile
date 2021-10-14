@@ -50,7 +50,6 @@ pipeline {
       steps {
         script {
           promotion.releaseNewVersion(env.GIT_URL, promoteLevel)
-          updateJenkinsLibraryReference()
         }
       }
     }
