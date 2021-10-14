@@ -16,9 +16,9 @@
 # Find the hICN control library and include files
 #
 
-set(HICN_SEARCH_PATH_LIST
-  ${HICN_HOME}
-  $ENV{HICN_HOME}
+set(LIBHICN_SEARCH_PATH_LIST
+  ${LIBHICN_HOME}
+  $ENV{LIBHICN_HOME}
   $ENV{FOUNDATION_HOME}
   /usr/local
   /opt
@@ -26,13 +26,13 @@ set(HICN_SEARCH_PATH_LIST
 )
 
 find_path(LIBHICNCTRL_INCLUDE_DIR hicn/ctrl.h
-  HINTS ${HICN_SEARCH_PATH_LIST}
+  HINTS ${LIBHICN_SEARCH_PATH_LIST}
   PATH_SUFFIXES include
   DOC "Find the hICN control include"
 )
 
 find_library(LIBHICNCTRL_LIBRARY NAMES hicnctrl
-  HINTS ${HICN_SEARCH_PATH_LIST}
+  HINTS ${LIBHICN_SEARCH_PATH_LIST}
   PATH_SUFFIXES lib
   DOC "Find the hicn control library"
 )
@@ -41,5 +41,5 @@ set(LIBHICNCTRL_LIBRARIES ${LIBHICNCTRL_LIBRARY})
 set(LIBHICNCTRL_INCLUDE_DIRS ${LIBHICNCTRL_INCLUDE_DIR})
 
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(hicnctrl DEFAULT_MSG
+find_package_handle_standard_args(Libhicnctrl DEFAULT_MSG
         LIBHICNCTRL_LIBRARY LIBHICNCTRL_INCLUDE_DIR)

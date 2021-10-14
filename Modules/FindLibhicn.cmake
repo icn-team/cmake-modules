@@ -15,38 +15,38 @@
 #
 # Find the hcin libraries and includes
 # This module sets:
-#  HICN_FOUND: True if hicn was found
-#  HICN_LIBRARY:  The hicn library
-#  HICN_LIBRARIES:  The hicn library and dependencies
-#  HCIN_INCLUDE_DIR:  The hicn include dir
+#  LIBHICN_FOUND: True if hicn was found
+#  LIBHICN_LIBRARY:  The hicn library
+#  LIBHICN_LIBRARIES:  The hicn library and dependencies
+#  LIBHICN_INCLUDE_DIRS:  The hicn include dir
 #
 
-set(HICN_SEARCH_PATH_LIST
-  ${HICN_HOME}
-  $ENV{HICN_HOME}
+set(LIBHICN_SEARCH_PATH_LIST
+  ${LIBHICN_HOME}
+  $ENV{LIBHICN_HOME}
   $ENV{FOUNDATION_HOME}
   /usr/local
   /opt
   /usr
 )
 
-find_path(HICN_INCLUDE_DIR hicn/hicn.h
-  HINTS ${HICN_SEARCH_PATH_LIST}
+find_path(LIBHICN_INCLUDE_DIR hicn/hicn.h
+  HINTS ${LIBHICN_SEARCH_PATH_LIST}
   PATH_SUFFIXES include
   DOC "Find the hicn includes"
 )
 
-find_library(HICN_LIBRARY NAMES hicn
-  HINTS ${HICN_SEARCH_PATH_LIST}
+find_library(LIBHICN_LIBRARY NAMES hicn
+  HINTS ${LIBHICN_SEARCH_PATH_LIST}
   PATH_SUFFIXES lib
   DOC "Find the hicn libraries"
 )
 
-set(HICN_LIBRARIES ${HICN_LIBRARY})
+set(LIBHICN_LIBRARIES ${LIBHICN_LIBRARY})
 if (${CMAKE_SYSTEM_NAME} STREQUAL "Android")
-  set(HICN_LIBRARIES ${HICN_LIBRARIES} log)
+  set(LIBHICN_LIBRARIES ${LIBHICN_LIBRARIES} log)
 endif()
-set(HICN_INCLUDE_DIRS ${HICN_INCLUDE_DIR})
+set(LIBHICN_INCLUDE_DIRS ${LIBHICN_INCLUDE_DIR})
 
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(hicn  DEFAULT_MSG HICN_LIBRARY HICN_INCLUDE_DIR)
+find_package_handle_standard_args(Libhicn  DEFAULT_MSG LIBHICN_LIBRARY LIBHICN_INCLUDE_DIR)
