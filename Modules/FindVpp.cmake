@@ -87,9 +87,17 @@ find_library(VPP_LIBRARY_VLIBMEMORY
   PATH_SUFFIXES lib lib64
   DOC "Find the Vpp vlibmemory library"
 )
+execute_process(
+  COMMAND bash -c "dpkg -l | grep vpp-dev | awk '{print $3}'"
+  OUTPUT_VARIABLE VPP_VERSION
+)
+
+string(REPLACE "-" ";" VPP_VERSION ${VPP_VERSION})
+list (GET VPP_VERSION 0 VPP_VERSION)
+
 
 set(VPP_LIBRARIES ${VPP_LIBRARY_MEMORYCLIENT} ${VPP_LIBRARY_SVM} ${VPP_LIBRARY_INFRA} ${VPP_LIBRARY_VATPLUGIN} ${VPP_LIBRARY_VLIB} ${VPP_LIBRARY_VNET} ${VPP_LIBRARY_VAPICLIENT} ${VPP_LIBRARY_VLIBMEMORY})
 set(VPP_INCLUDE_DIRS ${VPP_INCLUDE_DIR} ${VPP_INCLUDE_DIR}/vpp_plugins)
 
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(Vpp DEFAULT_MSG VPP_LIBRARIES VPP_INCLUDE_DIRS)
+find_package_handle_standard_args(Vpp REQUIRED_VARS VPP_LIBRARIES VPP_INCLUDE_DIRS VERSION_VAR VPP_VERSION)

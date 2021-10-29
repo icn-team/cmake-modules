@@ -33,9 +33,26 @@ find_path(ASIO_INCLUDE_DIR asio.hpp
   DOC "Find the asio includes"
 )
 
-set(ASIO_INCLUDE_DIRS ${ASIO_INCLUDE_DIR})
-
+set(ASIO_FOUND False)
+if (NOT "${ASIO_INCLUDE_DIR}" STREQUAL "")
+  set(ASIO_INCLUDE_DIRS ${ASIO_INCLUDE_DIR})
+  set(ASIO_FOUND True)
+  file(READ "${ASIO_INCLUDE_DIR}/asio/version.hpp" asio_version)
+  string(REPLACE "\n" ";" asio_version ${asio_version})
+  foreach(line ${asio_version})
+      if ("${line}" MATCHES "#define ASIO_VERSION ")
+        string(REPLACE " " ";" line ${line})
+        list (GET line 2 VERSION)
+        math(EXPR ASIO_PATCH "${VERSION} % 100")
+        math(EXPR ASIO_MINOR "${VERSION} / 100 % 1000")
+        math(EXPR ASIO_MAJOR "${VERSION} / 100000")
+        set(ASIO_VERSION "${ASIO_MAJOR}.${ASIO_MINOR}.${ASIO_PATCH}")
+        break()
+      endif ()
+  endforeach()
+endif ()
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(Asio
   REQUIRED_VARS ASIO_INCLUDE_DIRS
+  VERSION_VAR ASIO_VERSION
 )

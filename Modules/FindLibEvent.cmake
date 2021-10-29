@@ -48,8 +48,25 @@ find_library(LIBEVENT_LIBRARY NAMES event
   PATH_SUFFIXES lib
   DOC "Find the LibEvent libraries" )
 
-set(LIBEVENT_LIBRARIES ${LIBEVENT_LIBRARY})
-set(LIBEVENT_INCLUDE_DIRS ${LIBEVENT_INCLUDE_DIR})
+set(LIBEVENT_FOUND False)
+if (NOT "${LIBEVENT_INCLUDE_DIR}" STREQUAL "")
+  set(LIBEVENT_LIBRARIES ${LIBEVENT_LIBRARY})
+  set(LIBEVENT_INCLUDE_DIRS ${LIBEVENT_INCLUDE_DIR})
+  set(LIBEVENT_FOUND True)
+  file(READ "${LIBEVENT_INCLUDE_DIR}/event2/event-config.h" libevent_version)
+  string(REPLACE "\n" ";" libevent_version ${libevent_version})
+  foreach(line ${libevent_version})
+      if ("${line}" MATCHES "#define EVENT__PACKAGE_VERSION ")
+        string(REPLACE " " ";" line ${line})
+        list (GET line 2 VERSION)
+        string(REPLACE "\"" "" VERSION ${VERSION})
+        string(REPLACE "-" ";" VERSION ${VERSION})
+        list (GET VERSION 0 VERSION)
+        break()
+      endif ()
+  endforeach()
+
+endif ()
 
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(LibEvent  DEFAULT_MSG LIBEVENT_LIBRARY LIBEVENT_INCLUDE_DIR)
+find_package_handle_standard_args(LibEvent REQUIRED_VARS LIBEVENT_LIBRARY LIBEVENT_INCLUDE_DIR VERSION_VAR LIBEVENT_VERSION)
