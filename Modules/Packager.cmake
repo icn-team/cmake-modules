@@ -19,47 +19,39 @@ set(CONTACT "hicn-dev@lists.fd.io" CACHE STRING "Contact")
 set(PACKAGE_MAINTAINER "ICN Team" CACHE STRING "Maintainer")
 set(PACKAGE_VENDOR "fd.io" CACHE STRING "Vendor")
 
-function(get_next_version VERSION NEXT_VERSION)
-  string(REGEX REPLACE "([0-9]+).([0-9]+)" "\\1;\\2" VER_NUMBERS ${VERSION})
-
-  # Increment version for getting next version value
-  list(GET VER_NUMBERS 0 major)
-  list(GET VER_NUMBERS 1 minor)
-
-  math(EXPR minor "${minor} + 4")
-
-  if (minor GREATER 12)
-    math(EXPR minor "${minor} % 12")
-    math(EXPR major "${major} + 1")
-  endif()
-
-  if (minor LESS 10)
-    set(minor "0${minor}")
-  endif()
-
-  set(${NEXT_VERSION} "${major}.${minor}" PARENT_SCOPE)
-endfunction()
-
 macro(extract_version)
   # Extract version from git
   execute_process(
-    COMMAND git describe --long --match v*
+    COMMAND git rev-parse --abbrev-ref HEAD
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-    OUTPUT_VARIABLE VER
+    OUTPUT_VARIABLE BRANCH
     OUTPUT_STRIP_TRAILING_WHITESPACE
   )
+  #set(BRANCH "master")
+  message(STATUS "Branch name: ${BRANCH}")
+  if (BRANCH MATCHES "master")
+    execute_process(
+      COMMAND git describe --tags --abbrev=0
+      WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+      OUTPUT_VARIABLE VER
+      OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+  elseif(BRANCH MATCHES "release/*")
+    string(REGEX REPLACE "release/" "" VER ${BRANCH})
+    set(VER "v${VER}.9999")
+  endif()
 
   if (NOT VER)
-    set(VER "v1.2-0-gcafe")
+    set(VER "v99.99.9999")
   endif()
   message(STATUS "Git describe output: ${VER}")
 
-  string(REGEX REPLACE "v([0-9]+).([0-9]+)-?(.*)?-([0-9]+)-(g[0-9a-f]+)" "\\1;\\2;\\3;\\4;\\5;" VER ${VER})
+  string(REGEX REPLACE "v([0-9]+).([0-9]+).([0-9]+)" "\\1;\\2;\\3;" VER ${VER})
   list(GET VER 0 VERSION_MAJOR)
   list(GET VER 1 VERSION_MINOR)
-  list(GET VER 2 RELEASE_CANDIDATE)
-  list(GET VER 3 VERSION_REVISION)
-  list(GET VER 4 COMMIT_NAME)
+  list(GET VER 2 VERSION_PATCH)
+  #list(GET VER 3 VERSION_REVISION)
+  #list(GET VER 4 COMMIT_NAME)
 endmacro(extract_version)
 
 function(make_packages)
@@ -78,45 +70,18 @@ function(make_packages)
 
     message(STATUS "Version major: ${VERSION_MAJOR}")
     message(STATUS "Version minor: ${VERSION_MINOR}")
-    message(STATUS "Release: ${RELEASE_CANDIDATE}")
-    message(STATUS "Revision: ${VERSION_REVISION}")
-    message(STATUS "Commit hash: ${COMMIT_NAME}")
+    message(STATUS "Version patch: ${VERSION_PATCH}")
 
-    set(tag "${VERSION_MAJOR}.${VERSION_MINOR}")
-    string(REPLACE "-" "~" tag ${tag})
-    set(commit_num ${VERSION_REVISION})
-    set(commit_name ${COMMIT_NAME})
+    set(tag "${PREFIX_VERSION}-${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
 
-    if (NOT DEFINED ENV{BUILD_NUMBER})
-      set(bld "b1")
-    else()
-      set(bld "b$ENV{BUILD_NUMBER}")
-    endif()
-    message(STATUS "Build number is: ${bld}")
 
-    #define DEB and RPM version numbers
-    if(NOT RELEASE_CANDIDATE)
-      if (commit_num)
-        set(deb_ver "${tag}.${commit_num}-release")
-        set(rpm_ver "${tag}.${commit_num}")
-      else()
-        set(deb_ver "${tag}-release")
-        set(rpm_ver "${tag}")
-      endif()
-      set(rpm_release "release")
-    else()
-      # TODO To be changed for next release with
-      #   set(deb_ver "${tag}${RELEASE_CANDIDATE}~${commit_num}")
-      #   set(rpm_ver "${tag}")
-      #   set(rpm_release "${RELEASE_CANDIDATE}~${commit_num}")
-      set(deb_ver "${tag}-${commit_num}")
-      set(rpm_ver "${tag}-${commit_num}")
-      set(rpm_release "1")
-    endif()
+    set(deb_ver "${tag}")
+    set(rpm_ver "${tag}")
 
     message(STATUS "Version: ${deb_ver}")
 
-    get_next_version(${tag} next_version)
+    #get_next_version(${tag} next_version)
+    set(next_version "${tag}")
     message(STATUS "Next version: ${next_version}")
 
     get_cmake_property(components COMPONENTS)
@@ -138,7 +103,6 @@ function(make_packages)
         OUTPUT_VARIABLE arch
         OUTPUT_STRIP_TRAILING_WHITESPACE
       )
-
       set(CPACK_${type}_PACKAGE_VERSION "${deb_ver}")
       foreach(lc ${components})
         if (${lc} MATCHES ".*Unspecified.*")
@@ -249,7 +213,7 @@ function(make_packages)
     set(CPACK_PACKAGE_VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_REVISION}")
     set(CPACK_PACKAGE_VERSION_MAJOR "${VERSION_MAJOR}")
     set(CPACK_PACKAGE_VERSION_MINOR "${VERSION_MINOR}")
-    set(CPACK_PACKAGE_VERSION_PATCH "${VERSION_REVISION}")
+    set(CPACK_PACKAGE_VERSION_PATCH "${VERSION_PATCH}")
     set(CPACK_PACKAGE_INSTALL_DIRECTORY "hICN Components")
 
     set(CPACK_COMPONENTS_ALL dependencies ${HICN_UTILS} ${HICN_LIGHT} ${HICN_APPS} ${FACEMGR} lib${LIBTRANSPORT} ${LIBTRANSPORT}-dev lib${LIBHICN} ${LIBHICN}-dev ${HICN_UTILS}-dev ${HICN_LIGHT}-dev ${HICN_APPS}-dev ${FACEMGR}-dev)
