@@ -21,13 +21,18 @@ set(PACKAGE_VENDOR "fd.io" CACHE STRING "Vendor")
 
 macro(extract_version)
   # Extract version from git
-  execute_process(
-    COMMAND git rev-parse --abbrev-ref HEAD
-    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-    OUTPUT_VARIABLE BRANCH
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-  )
-  #set(BRANCH "master")
+
+
+  set(BRANCH "$ENV{BRANCH_NAME}")
+  if (NOT BRANCH)
+    execute_process(
+      COMMAND git rev-parse --abbrev-ref HEAD
+      WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+      OUTPUT_VARIABLE BRANCH
+      OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+  endif()
+
   message(STATUS "Branch name: ${BRANCH}")
   if (BRANCH MATCHES "master")
     execute_process(
@@ -50,8 +55,6 @@ macro(extract_version)
   list(GET VER 0 VERSION_MAJOR)
   list(GET VER 1 VERSION_MINOR)
   list(GET VER 2 VERSION_PATCH)
-  #list(GET VER 3 VERSION_REVISION)
-  #list(GET VER 4 COMMIT_NAME)
 endmacro(extract_version)
 
 function(make_packages)
