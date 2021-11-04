@@ -1,3 +1,14 @@
+## v1.0.1 (2021-11-04)
+
+### Fix
+
+- **Packager.cmake**: correct generation packages
+
+### Feat
+
+- **find<library>.cmake**: search exact version of packages in find<module>.cmake
+- **FindModernCppKafka.cmake**: add FindModernCppKafka.cmake module
+
 ## v1.0.0 (2021-10-14)
 
 ### Refactor
