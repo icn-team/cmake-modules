@@ -18,11 +18,8 @@
 set(CONTACT "hicn-dev@lists.fd.io" CACHE STRING "Contact")
 set(PACKAGE_MAINTAINER "ICN Team" CACHE STRING "Maintainer")
 set(PACKAGE_VENDOR "fd.io" CACHE STRING "Vendor")
-
 macro(extract_version)
   # Extract version from git
-
-
   set(BRANCH "$ENV{BRANCH_NAME}")
   if (NOT BRANCH)
     execute_process(
@@ -33,6 +30,23 @@ macro(extract_version)
     )
   endif()
 
+  execute_process(
+  COMMAND git log -1 --pretty=format:%B
+    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+    OUTPUT_VARIABLE LAST_LOG
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+  )
+  string(REPLACE "\n" ";" LAST_LOG ${LAST_LOG})
+  foreach(line ${LAST_LOG})
+    if("${line}" MATCHES "#promote [0-9]+.[0-9]+")
+      string(REPLACE "\n" ";" line ${line})
+      string(REGEX MATCH "\\#promote [0-9]+.[0-9]+" PROMOTE ${line})
+      string(REGEX MATCH "[0-9]+.[0-9]+" NEXT_VERSION ${PROMOTE})
+      message(STATUS "NEXT VERSION ${VERSION}")
+      break()
+    endif()
+  endforeach()
+
   message(STATUS "Branch name: ${BRANCH}")
   if (BRANCH MATCHES "master")
     execute_process(
@@ -41,15 +55,31 @@ macro(extract_version)
       OUTPUT_VARIABLE VER
       OUTPUT_STRIP_TRAILING_WHITESPACE
     )
+
+    if(NEXT_VERSION)
+      if ("${VER}" STRLESS "v${NEXT_VERSION}")
+        set(VER "v${NEXT_VERSION}.0")
+      else()
+        string(REGEX REPLACE "v([0-9]+).([0-9]+).([0-9]+)" "\\1;\\2;\\3;" VER_LIST ${VER})
+        list(GET VER_LIST 0 VERSION_MAJOR)
+        list(GET VER_LIST 1 VERSION_MINOR)
+        list(GET VER_LIST 2 VERSION_PATCH)
+
+        MATH(EXPR VERSION_PATCH "${VERSION_PATCH}+1")
+        set(VER "v${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
+      endif()
+    else()
+      unset(VER)
+    endif()
+
   elseif(BRANCH MATCHES "release/*")
     string(REGEX REPLACE "release/" "" VER ${BRANCH})
     set(VER "v${VER}.9999")
   endif()
-
   if (NOT VER)
     set(VER "v99.99.9999")
   endif()
-  message(STATUS "Git describe output: ${VER}")
+  message(STATUS "Next Version: ${VER}")
 
   string(REGEX REPLACE "v([0-9]+).([0-9]+).([0-9]+)" "\\1;\\2;\\3;" VER ${VER})
   list(GET VER 0 VERSION_MAJOR)
@@ -75,8 +105,11 @@ function(make_packages)
     message(STATUS "Version minor: ${VERSION_MINOR}")
     message(STATUS "Version patch: ${VERSION_PATCH}")
 
-    set(tag "${PREFIX_VERSION}-${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
-
+    if(PREFIX_VERSION)
+      set(tag "${PREFIX_VERSION}-${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
+    else()
+      set(tag "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
+    endif()
 
     set(deb_ver "${tag}")
     set(rpm_ver "${tag}")
