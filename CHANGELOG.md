@@ -1,3 +1,9 @@
+## v1.0.2 (2021-11-05)
+
+### Feat
+
+- **Packager.cmake**: extract next version from git log
+
 ## v1.0.1 (2021-11-04)
 
 ### Fix
