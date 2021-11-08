@@ -1,3 +1,9 @@
+## v1.0.3 (2021-11-08)
+
+### Feat
+
+- **Packager.cmake**: add build number to deb package name
+
 ## v1.0.2 (2021-11-05)
 
 ### Feat
