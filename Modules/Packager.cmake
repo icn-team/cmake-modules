@@ -46,7 +46,6 @@ macro(extract_version)
       break()
     endif()
   endforeach()
-
   message(STATUS "Branch name: ${BRANCH}")
   if (BRANCH MATCHES "master")
     execute_process(
@@ -55,16 +54,14 @@ macro(extract_version)
       OUTPUT_VARIABLE VER
       OUTPUT_STRIP_TRAILING_WHITESPACE
     )
-
     if(NEXT_VERSION)
-      if ("${VER}" STRLESS "v${NEXT_VERSION}")
+      string(REGEX REPLACE "v([0-9]+).([0-9]+).([0-9]+)" "\\1;\\2;\\3;" VER_LIST ${VER})
+      list(GET VER_LIST 0 VERSION_MAJOR)
+      list(GET VER_LIST 1 VERSION_MINOR)
+      list(GET VER_LIST 2 VERSION_PATCH)
+      if ("${VERSION_MAJOR}.${VERSION_MINOR}" STRLESS "${NEXT_VERSION}")
         set(VER "v${NEXT_VERSION}.0")
       else()
-        string(REGEX REPLACE "v([0-9]+).([0-9]+).([0-9]+)" "\\1;\\2;\\3;" VER_LIST ${VER})
-        list(GET VER_LIST 0 VERSION_MAJOR)
-        list(GET VER_LIST 1 VERSION_MINOR)
-        list(GET VER_LIST 2 VERSION_PATCH)
-
         MATH(EXPR VERSION_PATCH "${VERSION_PATCH}+1")
         set(VER "v${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
       endif()
