@@ -1,3 +1,9 @@
+## v1.0.4 (2021-11-09)
+
+### Fix
+
+- **PAckager.cmake**: wrong string compare between current version and next version
+
 ## v1.0.3 (2021-11-08)
 
 ### Feat
