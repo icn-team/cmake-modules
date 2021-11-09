@@ -1,3 +1,9 @@
+## v1.0.5 (2021-11-09)
+
+### Fix
+
+- **Packager.cmake**: correct check branch
+
 ## v1.0.4 (2021-11-09)
 
 ### Fix
