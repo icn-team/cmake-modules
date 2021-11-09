@@ -21,7 +21,7 @@ set(PACKAGE_VENDOR "fd.io" CACHE STRING "Vendor")
 macro(extract_version)
   # Extract version from git
   set(BRANCH "$ENV{BRANCH_NAME}")
-  if (NOT BRANCH)
+  if (BRANCH STREQUAL "")
     execute_process(
       COMMAND git rev-parse --abbrev-ref HEAD
       WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
@@ -31,11 +31,11 @@ macro(extract_version)
   endif()
 
   execute_process(
-  COMMAND git log -1 --pretty=format:%B
-    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-    OUTPUT_VARIABLE LAST_LOG
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-  )
+    COMMAND git log -1 --pretty=format:%B
+      WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+      OUTPUT_VARIABLE LAST_LOG
+      OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
   string(REPLACE "\n" ";" LAST_LOG ${LAST_LOG})
   foreach(line ${LAST_LOG})
     if("${line}" MATCHES "#promote [0-9]+.[0-9]+")
@@ -69,7 +69,7 @@ macro(extract_version)
       unset(VER)
     endif()
 
-  elseif(BRANCH MATCHES "release/*")
+  elseif(BRANCH MATCHES "^release/")
     string(REGEX REPLACE "release/" "" VER ${BRANCH})
     set(VER "v${VER}.9999")
   endif()
@@ -77,7 +77,6 @@ macro(extract_version)
     set(VER "v99.99.9999")
   endif()
   message(STATUS "Next Version: ${VER}")
-
   string(REGEX REPLACE "v([0-9]+).([0-9]+).([0-9]+)" "\\1;\\2;\\3;" VER ${VER})
   list(GET VER 0 VERSION_MAJOR)
   list(GET VER 1 VERSION_MINOR)
@@ -101,7 +100,7 @@ function(make_packages)
     message(STATUS "Version major: ${VERSION_MAJOR}")
     message(STATUS "Version minor: ${VERSION_MINOR}")
     message(STATUS "Version patch: ${VERSION_PATCH}")
-    if (DEFINED ENV{BUILD_NUMBER})
+    if (NOT ENV{BUILD_NUMBER} STREQUAL "")
       message(STATUS "Build number $ENV{BUILD_NUMBER}")
       set(BUILD_NUMBER ".$ENV{BUILD_NUMBER}")
     endif()
