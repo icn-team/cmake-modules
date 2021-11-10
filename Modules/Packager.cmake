@@ -18,69 +18,28 @@
 set(CONTACT "hicn-dev@lists.fd.io" CACHE STRING "Contact")
 set(PACKAGE_MAINTAINER "ICN Team" CACHE STRING "Maintainer")
 set(PACKAGE_VENDOR "fd.io" CACHE STRING "Vendor")
+
 macro(extract_version)
-  # Extract version from git
-  set(BRANCH "$ENV{BRANCH_NAME}")
-  if (BRANCH STREQUAL "")
-    execute_process(
-      COMMAND git rev-parse --abbrev-ref HEAD
-      WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-      OUTPUT_VARIABLE BRANCH
-      OUTPUT_STRIP_TRAILING_WHITESPACE
-    )
-  endif()
-
+# Extract version from git
   execute_process(
-    COMMAND git log -1 --pretty=format:%B
-      WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-      OUTPUT_VARIABLE LAST_LOG
-      OUTPUT_STRIP_TRAILING_WHITESPACE
-    )
-  string(REPLACE "\n" ";" LAST_LOG ${LAST_LOG})
-  foreach(line ${LAST_LOG})
-    if("${line}" MATCHES "#promote [0-9]+.[0-9]+")
-      string(REPLACE "\n" ";" line ${line})
-      string(REGEX MATCH "\\#promote [0-9]+.[0-9]+" PROMOTE ${line})
-      string(REGEX MATCH "[0-9]+.[0-9]+" NEXT_VERSION ${PROMOTE})
-      message(STATUS "Next Version ${NEXT_VERSION}")
-      break()
-    endif()
-  endforeach()
-  message(STATUS "Branch name: ${BRANCH}")
-  if (BRANCH MATCHES "master")
-    execute_process(
-      COMMAND git describe --tags --abbrev=0
-      WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-      OUTPUT_VARIABLE VER
-      OUTPUT_STRIP_TRAILING_WHITESPACE
-    )
-    if(NEXT_VERSION)
-      string(REGEX REPLACE "v([0-9]+).([0-9]+).([0-9]+)" "\\1;\\2;\\3;" VER_LIST ${VER})
-      list(GET VER_LIST 0 VERSION_MAJOR)
-      list(GET VER_LIST 1 VERSION_MINOR)
-      list(GET VER_LIST 2 VERSION_PATCH)
-      if ("${VERSION_MAJOR}.${VERSION_MINOR}" STRLESS "${NEXT_VERSION}")
-        set(VER "v${NEXT_VERSION}.0")
-      else()
-        MATH(EXPR VERSION_PATCH "${VERSION_PATCH}+1")
-        set(VER "v${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
-      endif()
-    else()
-      unset(VER)
-    endif()
+    COMMAND git describe --long
+    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+    OUTPUT_VARIABLE VER
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+  )
 
-  elseif(BRANCH MATCHES "^release/")
-    string(REGEX REPLACE "release/" "" VER ${BRANCH})
-    set(VER "v${VER}.9999")
-  endif()
-  if (NOT VER)
-    set(VER "v99.99.9999")
-  endif()
-  message(STATUS "Next Version: ${VER}")
-  string(REGEX REPLACE "v([0-9]+).([0-9]+).([0-9]+)" "\\1;\\2;\\3;" VER ${VER})
-  list(GET VER 0 VERSION_MAJOR)
-  list(GET VER 1 VERSION_MINOR)
-  list(GET VER 2 VERSION_PATCH)
+if (NOT VER)
+  set(VER "v2.10.0rc0-0-gbe4c28e3")
+endif()
+message(STATUS "Git describe output: ${VER}")
+
+string(REGEX REPLACE "v([0-9]+).([0-9]+).([0-9]+)(.*)?-([0-9]+)-(g[0-9a-f]+)" "\\1;\\2;\\3;\\4;\\5;\\6;" VER ${VER})
+list(GET VER 0 VERSION_MAJOR)
+list(GET VER 1 VERSION_MINOR)
+list(GET VER 2 VERSION_PATCH)
+list(GET VER 3 RELEASE_CANDIDATE)
+list(GET VER 4 VERSION_REVISION)
+list(GET VER 5 COMMIT_NAME)
 endmacro(extract_version)
 
 function(make_packages)
@@ -100,14 +59,19 @@ function(make_packages)
     message(STATUS "Version major: ${VERSION_MAJOR}")
     message(STATUS "Version minor: ${VERSION_MINOR}")
     message(STATUS "Version patch: ${VERSION_PATCH}")
-    if (NOT ENV{BUILD_NUMBER} STREQUAL "")
-      message(STATUS "Build number $ENV{BUILD_NUMBER}")
-      set(BUILD_NUMBER ".$ENV{BUILD_NUMBER}")
+    message(STATUS "Release candidate: ${RELEASE_CANDIDATE}")
+    message(STATUS "Version revision: ${VERSION_REVISION}")
+    message(STATUS "Commit hash: ${COMMIT_NAME}")
+
+    if (RELEASE_CANDIDATE STREQUAL "")
+      set(VERSION_REVISION "")
+    else()
+      set(VERSION_REVISION "-${VERSION_REVISION}")
     endif()
     if(PREFIX_VERSION)
-      set(tag "${PREFIX_VERSION}-${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}${BUILD_NUMBER}")
+      set(tag "${PREFIX_VERSION}-${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}${RELEASE_CANDIDATE}${VERSION_REVISION}")
     else()
-      set(tag "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}${BUILD_NUMBER}")
+      set(tag "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}${RELEASE_CANDIDATE}${VERSION_REVISION}")
     endif()
 
     set(deb_ver "${tag}")
@@ -285,7 +249,6 @@ function(make_packages)
       set(CPACK_COMPONENT_${HICN_APPS_UPPERCASE}_INSTALL_TYPES Full)
       set(CPACK_COMPONENT_${HICN_APPS_DEV_UPPERCASE}_INSTALL_TYPES Full)
     endif ()
-  
     if (NOT "${FACEMGR}" STREQUAL "")
       string(TOUPPER ${FACEMGR} FACEMGR_UPPERCASE)
       string(TOUPPER ${FACEMGR}-dev FACEMGR_DEV_UPPERCASE)
