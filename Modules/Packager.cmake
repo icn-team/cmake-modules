@@ -22,7 +22,7 @@ set(PACKAGE_VENDOR "fd.io" CACHE STRING "Vendor")
 macro(extract_version)
 # Extract version from git
   execute_process(
-    COMMAND git describe --long
+    COMMAND git describe --long --match v*
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
     OUTPUT_VARIABLE VER
     OUTPUT_STRIP_TRAILING_WHITESPACE
