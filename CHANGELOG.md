@@ -1,3 +1,10 @@
+## v1.0.6 (2021-11-10)
+
+### Feat
+
+- **Packager.cmake**: extract package version from the tag
+- **Packager.cmake**: extract package version from the tag
+
 ## v1.0.5 (2021-11-09)
 
 ### Fix
