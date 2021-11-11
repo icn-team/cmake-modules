@@ -90,7 +90,7 @@ macro(build_library lib)
   cmake_parse_arguments(ARG
     "SHARED;STATIC;NO_DEV;EMPTY_PREFIX"
     "COMPONENT;"
-    "SOURCES;LINK_LIBRARIES;OBJECT_LIBRARIES;LINK_FLAGS;INSTALL_HEADERS;DEPENDS;INCLUDE_DIRS;DEFINITIONS;HEADER_ROOT_DIR;LIBRARY_ROOT_DIR;INSTALL_FULL_PATH_DIR;COMPILE_OPTIONS;VERSION;INSTALL_RPATH"
+    "SOURCES;EXPORT_NAME;LINK_LIBRARIES;OBJECT_LIBRARIES;LINK_FLAGS;INSTALL_HEADERS;DEPENDS;INCLUDE_DIRS;DEFINITIONS;HEADER_ROOT_DIR;LIBRARY_ROOT_DIR;INSTALL_FULL_PATH_DIR;COMPILE_OPTIONS;VERSION;INSTALL_RPATH"
     ${ARGN}
   )
 
@@ -181,17 +181,16 @@ macro(build_library lib)
 
     # library deps
     if(ARG_LINK_LIBRARIES)
-      target_link_libraries(${library} PUBLIC ${ARG_LINK_LIBRARIES})
+      target_link_libraries(${library} ${ARG_LINK_LIBRARIES})
     endif()
 
     if(ARG_DEFINITIONS)
-      target_compile_definitions(${library} PRIVATE ${ARG_DEFINITIONS})
+      target_compile_definitions(${library} ${ARG_DEFINITIONS})
     endif()
 
     if(ARG_INCLUDE_DIRS)
-      target_include_directories(${library} BEFORE PUBLIC
+      target_include_directories(${library} BEFORE
         ${ARG_INCLUDE_DIRS}
-        ${PROJECT_BINARY_DIR}
       )
     endif()
 
@@ -208,8 +207,16 @@ macro(build_library lib)
       set(INSTALL_LIB_PATH ${ARG_INSTALL_FULL_PATH_DIR})
     endif()
 
+    if (ARG_EXPORT_NAME)
+      list(APPEND EXPORT_ARGS
+        "EXPORT"
+        ${ARG_EXPORT_NAME}
+      )
+    endif()
+
     install(
       TARGETS ${library}
+      ${EXPORT_ARGS}
       COMPONENT ${ARG_COMPONENT}
       RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
       ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
