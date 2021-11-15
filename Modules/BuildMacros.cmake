@@ -210,7 +210,7 @@ macro(build_library lib)
     if (ARG_EXPORT_NAME)
       list(APPEND EXPORT_ARGS
         "EXPORT"
-        ${ARG_EXPORT_NAME}
+        "${ARG_EXPORT_NAME}-targets"
       )
     endif()
 

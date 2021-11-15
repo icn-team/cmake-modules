@@ -18,7 +18,7 @@ macro (create_cmake_config module)
   cmake_parse_arguments(ARG
     ""
     ""
-    "PKG_CONF_FILE;TARGETS;INCLUDE_DIRS"
+    "PKG_CONF_FILE;TARGETS;INCLUDE_DIRS;VERSION"
     ${ARGN}
   )
 
@@ -32,42 +32,41 @@ macro (create_cmake_config module)
   # set installation path
   set(CMAKECONFIG_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}/cmake/${module}")
 
+  if (NOT ARG_TARGETS)
+    set(ARG_TARGETS "${module}-targets")
+  endif()
+
   if (NOT ARG_PKG_CONF_FILE)
     set(ARG_PKG_CONF_FILE "${module}-config.cmake")
   endif()
 
-  if (ARG_INCLUDE_DIRS)
-    set(${module_name}_INCLUDE_DIRS "${ARG_INCLUDE_DIRS}")
+  if (ARG_PACKAGE_REGISTRY)
+    if (ARG_INCLUDE_DIRS)
+      set(${module_name}_INCLUDE_DIRS "${ARG_INCLUDE_DIRS}")
+    endif()
+
+    # create in-source module config file
+    configure_package_config_file(
+      ${ARG_PKG_CONF_FILE}.in
+      ${ARG_PKG_CONF_FILE}
+      INSTALL_DESTINATION ${CMAKECONFIG_INSTALL_DIR}
+      PATH_VARS ${module_name}_INCLUDE_DIRS
+    )
+
+    # export the export group to be used locally
+    export (
+      EXPORT ${ARG_TARGETS}
+      NAMESPACE ${module_name}::
+      FILE ${CMAKE_CURRENT_BINARY_DIR}/${ARG_TARGETS}.cmake
+    )
+
+    # add module to local cmake package registry
+    export (
+      PACKAGE ${module_name}
+    )
   endif()
 
-  # create in-source module config file
-  configure_package_config_file(
-    ${ARG_PKG_CONF_FILE}.in
-    ${ARG_PKG_CONF_FILE}
-    INSTALL_DESTINATION ${CMAKECONFIG_INSTALL_DIR}
-    PATH_VARS ${module_name}_INCLUDE_DIRS
-  )
-
-  if (NOT ARG_TARGETS)
-    set(ARG_TARGETS "${module}")
-  endif()
-
-  message("${ARG_TARGETS} --> ${CMAKE_CURRENT_BINARY_DIR}/${ARG_TARGETS}.cmake")
-  # export the export group to be used locally
-  export (
-    EXPORT ${ARG_TARGETS}
-    NAMESPACE ${module_name}::
-    FILE ${CMAKE_CURRENT_BINARY_DIR}/${ARG_TARGETS}.cmake
-  )
-
-  # add module to local cmake package registry
-  export (
-    PACKAGE ${module_name}
-  )
-
-  if (ARG_INCLUDE_DIRS)
-    set (${module_name}_INCLUDE_DIRS ${CMAKE_INSTALL_INCLUDEDIR})
-  endif()
+  set (${module_name}_INCLUDE_DIRS ${CMAKE_INSTALL_INCLUDEDIR})
 
   # create to-install module config file
   configure_package_config_file(
@@ -87,6 +86,22 @@ macro (create_cmake_config module)
 
   install(
     FILES "${CMAKE_CURRENT_BINARY_DIR}/export/${ARG_PKG_CONF_FILE}"
+    DESTINATION ${CMAKECONFIG_INSTALL_DIR}
+  )
+
+  # create version file and install it
+  if (NOT ARG_VERSION)
+    message(FATAL_ERROR "No version specified for module ${module}")
+  endif()
+
+  write_basic_package_version_file(
+    ${CMAKE_CURRENT_BINARY_DIR}/${module}-config-version.cmake
+    VERSION ${ARG_VERSION}
+    COMPATIBILITY SameMinorVersion
+  )
+
+  install(
+    FILES ${CMAKE_CURRENT_BINARY_DIR}/${module}-config-version.cmake
     DESTINATION ${CMAKECONFIG_INSTALL_DIR}
   )
 endmacro(create_cmake_config)
