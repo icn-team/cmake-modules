@@ -1,3 +1,11 @@
+## v1.1.0 (2021-11-15)
+
+### Feat
+
+- improve macros to create and install cmake config files #promote MINOR
+- **kafka**: update kafka wrapper lib version
+- add macros to create cmake config installation files
+
 ## v1.0.6 (2021-11-10)
 
 ### Feat
