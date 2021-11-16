@@ -47,12 +47,43 @@ if (CPPKAFKA_CMAKE_VERBOSE)
     message(STATUS "RdKafka_LIBRARY_CPP_PATH = ${RdKafka_LIBRARY_CPP_PATH}")
 endif()
 
+
+macro(parse lineinput major minor patch)
+    string(REPLACE " " ";" line ${lineinput})
+    list (GET line 3 version)
+    string(SUBSTRING "${version}" 2 2 major)
+    string(SUBSTRING "${version}" 4 2 minor)
+    string(SUBSTRING "${version}" 6 2 patch)
+endmacro()
+
+set(RdKafka_FOUND False)
+if (NOT "${RdKafka_INCLUDE_DIR}" STREQUAL "")
+  set(RdKafka_FOUND True)
+  file(READ "${RdKafka_INCLUDE_DIR}/librdkafka/rdkafka.h" rdkafka)
+  string(REPLACE "\n" ";" rdkafka ${rdkafka})
+  foreach(line ${rdkafka})
+     if ("${line}" MATCHES "#define RD_KAFKA_VERSION")
+       parse(${line} major minor patch)
+       set(RdKafka_MAJOR "${major}")
+       math(EXPR RdKafka_MAJOR "${RdKafka_MAJOR}")
+       set(RdKafka_MINOR "${minor}")
+       math(EXPR RdKafka_MINOR "${RdKafka_MINOR}")
+       set(RdKafka_PATCH "${patch}")
+       math(EXPR RdKafka_PATCH "${RdKafka_PATCH}")
+     endif ()
+  endforeach()
+  set(RdKafka_VERSION "${RdKafka_MAJOR}.${RdKafka_MINOR}.${RdKafka_PATCH}")
+endif ()
+
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(RdKafka DEFAULT_MSG
+find_package_handle_standard_args(RdKafka
+    REQUIRED_VARS
     RdKafka_LIBNAME
     RdKafka_LIBRARY_PATH
     RdKafka_LIBRARY_CPP_PATH
     RdKafka_INCLUDE_DIR
+    VERSION_VAR
+    RdKafka_VERSION
 )
 
 set(CONTENTS "#include <librdkafka/rdkafka.h>\n #if RD_KAFKA_VERSION >= ${RDKAFKA_MIN_VERSION_HEX}\n int main() { }\n #endif")

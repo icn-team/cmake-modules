@@ -37,9 +37,37 @@ find_library(LIBHICNCTRL_LIBRARY NAMES hicnctrl
   DOC "Find the hicn control library"
 )
 
+
+macro(parse lineinput returnValue)
+    string(REPLACE "\"" "" line ${lineinput})
+    string(REPLACE " " ";" line ${line})
+    list (GET line 2 returnValue)
+endmacro()
+
+set(LIBHICNCTRL_FOUND False)
+if (NOT "${LIBHICNCTRL_INCLUDE_DIR}" STREQUAL "")
+  set(LIBHICN_FOUND True)
+  file(READ "${LIBHICNCTRL_INCLUDE_DIR}/hicn/transport/config.h" libhicnctrl)
+  string(REPLACE "\n" ";" libhicnctrl ${libhicnctrl})
+  foreach(line ${transport})
+    if ("${line}" MATCHES "#define HICNTRANSPORT_VERSION_MAJOR")
+      parse(${line} returnValue)
+      set(LIBHICNCTRL_MAJOR "${returnValue}")
+    endif ()
+    if ("${line}" MATCHES "#define HICNTRANSPORT_VERSION_MINOR")
+      parse(${line} returnValue)
+      set(LIBHICNCTRL_MINOR "${returnValue}")
+    endif ()
+    if ("${line}" MATCHES "#define HICNTRANSPORT_VERSION_PATCH")
+      parse(${line} returnValue)
+      set(LIBHICNCTRL_PATCH "${returnValue}")
+    endif ()
+  endforeach()
+  set(LIBHICNCTRL_VERSION "${LIBHICNCTRL_MAJOR}.${LIBHICNCTRL_MINOR}.${LIBHICNCTRL_PATCH}")
+endif ()
 set(LIBHICNCTRL_LIBRARIES ${LIBHICNCTRL_LIBRARY})
 set(LIBHICNCTRL_INCLUDE_DIRS ${LIBHICNCTRL_INCLUDE_DIR})
 
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(Libhicnctrl DEFAULT_MSG
-        LIBHICNCTRL_LIBRARY LIBHICNCTRL_INCLUDE_DIR)
+find_package_handle_standard_args(Libhicnctrl REQUIRED_VARS
+        LIBHICNCTRL_LIBRARY LIBHICNCTRL_INCLUDE_DIR VERSION_VAR LIBHICNCTRL_VERSION)
