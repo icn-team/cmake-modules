@@ -1,3 +1,9 @@
+## v1.1.1 (2021-11-16)
+
+### Feat
+
+- **FindHicn.cmake**: add version check on hproxy dependencies
+
 ## v1.1.0 (2021-11-15)
 
 ### Feat
