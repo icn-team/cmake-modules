@@ -18,7 +18,7 @@ macro (create_cmake_config module)
   cmake_parse_arguments(ARG
     ""
     ""
-    "PKG_CONF_FILE;TARGETS;INCLUDE_DIRS;VERSION"
+    "PKG_CONF_FILE;TARGETS;INCLUDE_DIRS;VERSION;COMPONENT"
     ${ARGN}
   )
 
@@ -34,6 +34,10 @@ macro (create_cmake_config module)
 
   if (NOT ARG_TARGETS)
     set(ARG_TARGETS "${module}-targets")
+  endif()
+
+  if (NOT ARG_COMPONENT)
+    set(ARG_COMPONENT "cmake-config")
   endif()
 
   if (NOT ARG_PKG_CONF_FILE)
@@ -82,11 +86,13 @@ macro (create_cmake_config module)
     FILE ${ARG_TARGETS}.cmake
     NAMESPACE ${module_name}::
     DESTINATION ${CMAKECONFIG_INSTALL_DIR}
+    COMPONENT ${ARG_COMPONENT}
   )
 
   install(
     FILES "${CMAKE_CURRENT_BINARY_DIR}/export/${ARG_PKG_CONF_FILE}"
     DESTINATION ${CMAKECONFIG_INSTALL_DIR}
+    COMPONENT ${ARG_COMPONENT}
   )
 
   # create version file and install it
@@ -103,5 +109,6 @@ macro (create_cmake_config module)
   install(
     FILES ${CMAKE_CURRENT_BINARY_DIR}/${module}-config-version.cmake
     DESTINATION ${CMAKECONFIG_INSTALL_DIR}
+    COMPONENT ${ARG_COMPONENT}
   )
 endmacro(create_cmake_config)
