@@ -18,7 +18,7 @@ macro (create_cmake_config module)
   cmake_parse_arguments(ARG
     ""
     ""
-    "PKG_CONF_FILE;TARGETS;INCLUDE_DIRS;VERSION;COMPONENT"
+    "PKG_CONF_FILE;TARGETS;INCLUDE_DIRS;VERSION;COMPONENT;NAMESPACE"
     ${ARGN}
   )
 
@@ -44,6 +44,10 @@ macro (create_cmake_config module)
     set(ARG_PKG_CONF_FILE "${module}-config.cmake")
   endif()
 
+  if (NOT ARG_NAMESPACE)
+    set(ARG_NAMESPACE ${module_name})
+  endif()
+
   if (ARG_PACKAGE_REGISTRY)
     if (ARG_INCLUDE_DIRS)
       set(${module_name}_INCLUDE_DIRS "${ARG_INCLUDE_DIRS}")
@@ -60,7 +64,7 @@ macro (create_cmake_config module)
     # export the export group to be used locally
     export (
       EXPORT ${ARG_TARGETS}
-      NAMESPACE ${module_name}::
+      NAMESPACE ${ARG_NAMESPACE}::
       FILE ${CMAKE_CURRENT_BINARY_DIR}/${ARG_TARGETS}.cmake
     )
 
@@ -84,7 +88,7 @@ macro (create_cmake_config module)
   install(
     EXPORT ${ARG_TARGETS}
     FILE ${ARG_TARGETS}.cmake
-    NAMESPACE ${module_name}::
+    NAMESPACE ${ARG_NAMESPACE}::
     DESTINATION ${CMAKECONFIG_INSTALL_DIR}
     COMPONENT ${ARG_COMPONENT}
   )
