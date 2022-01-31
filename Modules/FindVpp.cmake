@@ -87,8 +87,9 @@ find_library(VPP_LIBRARY_VLIBMEMORY
   PATH_SUFFIXES lib lib64
   DOC "Find the Vpp vlibmemory library"
 )
+
 execute_process(
-  COMMAND bash -c "dpkg -l | grep vpp-dev | awk '{print $3}'"
+  COMMAND bash -xc "readlink ${VPP_LIBRARY_VNET} | awk -F. '{ printf(\"%s.%s\", \$(NF-1), \$(NF)) }'"
   OUTPUT_VARIABLE VPP_VERSION
 )
 
