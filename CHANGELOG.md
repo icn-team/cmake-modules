@@ -1,3 +1,14 @@
+## v1.1.3 (2022-02-14)
+
+### Fix
+
+- **gtest**: new gtest repo
+- do not retrieve VPP version by using package manager
+
+### Feat
+
+- add FindCiscoSafeC.cmake
+
 ## v1.1.2 (2021-12-09)
 
 ## v1.1.1 (2021-11-16)
