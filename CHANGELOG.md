@@ -1,3 +1,9 @@
+## production (2022-02-16)
+
+### Feat
+
+- add macros to retrieve CPU information
+
 ## v1.1.3 (2022-02-14)
 
 ### Fix
