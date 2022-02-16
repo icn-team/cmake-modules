@@ -171,8 +171,11 @@ macro(build_library lib)
         WINDOWS_EXPORT_ALL_SYMBOLS TRUE
       )
     else ()
-      target_compile_options(${library}
-        PRIVATE -Wall -Werror ${ARG_COMPILE_OPTIONS})
+      target_compile_options(
+          ${library}
+          PUBLIC ${DEFAULT_MARCH_FLAGS}
+          PRIVATE -Wall -Werror ${ARG_COMPILE_OPTIONS}
+        )
       set_target_properties(${library}
         PROPERTIES
         OUTPUT_NAME ${lib}
