@@ -41,8 +41,8 @@ macro(build_executable exec)
   # Check for code coverage options
   if (COVERAGE AND CMAKE_BUILD_TYPE MATCHES "Debug" AND CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     list (APPEND ARG_COMPILE_OPTIONS
-      "-fprofile-instr-generate"
-      "-fcoverage-mapping"
+      PRIVATE "-fprofile-instr-generate"
+      PRIVATE "-fcoverage-mapping"
     )
 
     list (APPEND ARG_LINK_FLAGS
@@ -136,8 +136,8 @@ macro(build_library lib)
   # Check for code coverage options
   if (COVERAGE AND CMAKE_BUILD_TYPE MATCHES "Debug" AND CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     list (APPEND ARG_COMPILE_OPTIONS
-      "-fprofile-instr-generate"
-      "-fcoverage-mapping"
+      PRIVATE "-fprofile-instr-generate"
+      PRIVATE "-fcoverage-mapping"
     )
 
     list (APPEND ARG_LINK_FLAGS
