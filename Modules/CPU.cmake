@@ -35,7 +35,8 @@ else()
 endif()
 
 set(CACHE_LINE_SIZE ${CACHE_LINE_SIZE}
-    CACHE STRING "Target CPU cache line size")
+  CACHE STRING "Target CPU cache line size"
+)
 
 set_log2_cacheline_size(LOG2_CACHE_LINE_SIZE ${CACHE_LINE_SIZE})
 

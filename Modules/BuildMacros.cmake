@@ -16,6 +16,7 @@
 #
 
 include(GNUInstallDirs)
+include(Misc)
 
 macro(build_executable exec)
   cmake_parse_arguments(ARG
@@ -24,6 +25,18 @@ macro(build_executable exec)
     "SOURCES;LINK_LIBRARIES;DEPENDS;INCLUDE_DIRS;DEFINITIONS;COMPILE_OPTIONS;LINK_FLAGS;INSTALL_RPATH"
     ${ARGN}
   )
+
+  pr("Building executable" "${exec}")
+  pr("  No Install: ${ARG_NO_INSTALL}")
+  pr("  Install component" "${ARG_COMPONENT}")
+  pr("  Link libraries" "${ARG_LINK_LIBRARIES}")
+  pr("  Link flags" "${ARG_LINK_FLAGS}")
+  # pr("  Install headers" "${ARG_INSTALL_HEADERS}")
+  pr("  Dependencies" "${ARG_DEPENDS}")
+  pr("  Include directories" "${ARG_INCLUDE_DIRS}")
+  pr("  Definitions" "${ARG_DEFINITIONS}")
+  pr("  Compile options" "${ARG_COMPILE_OPTIONS}")
+  pr("  Install rpath" "${ARG_INSTALL_RPATH}")
 
   # Check for code coverage options
   if (COVERAGE AND CMAKE_BUILD_TYPE MATCHES "Debug" AND CMAKE_CXX_COMPILER_ID MATCHES "Clang")
@@ -63,7 +76,9 @@ macro(build_executable exec)
     add_dependencies(${exec}-bin ${ARG_DEPENDS})
   endif()
 
-  target_compile_options(${exec}-bin PRIVATE -Wall -Werror ${ARG_COMPILE_OPTIONS})
+  if (ARG_COMPILE_OPTIONS)
+    target_compile_options(${exec}-bin ${ARG_COMPILE_OPTIONS})
+  endif()
 
   if(ARG_DEFINITIONS)
     target_compile_definitions(${exec}-bin PRIVATE ${ARG_DEFINITIONS})
@@ -94,7 +109,29 @@ macro(build_library lib)
     ${ARGN}
   )
 
-  message(STATUS "Building library ${lib}")
+  if (ARG_EMPTY_PREFIX)
+    set(libtype module)
+  else()
+    set(libtype library)
+  endif()
+  pr("Building ${libtype}" "${lib}")
+  pr("  Shared" "${ARG_SHARED}")
+  pr("  Static" "${ARG_STATIC}")
+  pr("  No 'lib' prefix" "${ARG_EMPTY_PREFIX}")
+  pr("  Install component" "${ARG_COMPONENT}")
+  pr("  Link libraries" "${ARG_LINK_LIBRARIES}")
+  pr("  Object libraries" "${ARG_OBJECT_LIBRARIES}")
+  pr("  Link flags" "${ARG_LINK_FLAGS}")
+  # pr("  Install headers" "${ARG_INSTALL_HEADERS}")
+  pr("  Dependencies" "${ARG_DEPENDS}")
+  pr("  Include directories" "${ARG_INCLUDE_DIRS}")
+  pr("  Definitions" "${ARG_DEFINITIONS}")
+  pr("  Header root directory" "${ARG_HEADER_ROOT_DIR}")
+  pr("  Library root directory" "${ARG_LIBRARY_ROOT_DIR}")
+  pr("  Install full path directory" "${ARG_INSTALL_FULL_PATH_DIR}")
+  pr("  Compile options" "${ARG_COMPILE_OPTIONS}")
+  pr("  Version" "${ARG_VERSION}")
+  pr("  Install rpath" "${ARG_INSTALL_RPATH}")
 
   # Check for code coverage options
   if (COVERAGE AND CMAKE_BUILD_TYPE MATCHES "Debug" AND CMAKE_CXX_COMPILER_ID MATCHES "Clang")
@@ -165,22 +202,16 @@ macro(build_library lib)
     )
 
     if (WIN32)
-      target_compile_options(${library} PRIVATE ${ARG_COMPILE_OPTIONS})
-      set_target_properties(${library}
-        PROPERTIES
-        WINDOWS_EXPORT_ALL_SYMBOLS TRUE
-      )
-    else ()
-      target_compile_options(
-          ${library}
-          PUBLIC ${DEFAULT_MARCH_FLAGS}
-          PRIVATE -Wall -Werror ${ARG_COMPILE_OPTIONS}
-        )
-      set_target_properties(${library}
-        PROPERTIES
-        OUTPUT_NAME ${lib}
-      )
-    endif ()
+      set(PROPS WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
+    else()
+      set(PROPS OUTPUT_NAME ${lib})
+    endif()
+
+    if (ARG_COMPILE_OPTIONS)
+      target_compile_options(${library} ${ARG_COMPILE_OPTIONS})
+    endif()
+
+    set_target_properties(${library} PROPERTIES ${PROPS})
 
     # library deps
     if(ARG_LINK_LIBRARIES)
@@ -300,7 +331,17 @@ macro (build_module module)
     ${ARGN}
   )
 
-  message(STATUS "Building module ${module}")
+  if (${CMAKE_SYSTEM_NAME} MATCHES Darwin)
+    list(APPEND ARG_LINK_FLAGS "-Wl,-undefined,dynamic_lookup")
+  elseif(${CMAKE_SYSTEM_NAME} MATCHES iOS)
+    list(APPEND ARG_LINK_FLAGS "-Wl,-undefined,dynamic_lookup")
+  elseif(${CMAKE_SYSTEM_NAME} MATCHES Linux)
+    list(APPEND ARG_LINK_FLAGS "-Wl,-unresolved-symbols=ignore-all")
+  elseif(${CMAKE_SYSTEM_NAME} MATCHES Windows)
+    list(APPEND ARG_LINK_FLAGS "/wd4275")
+  else()
+    message(FATAL_ERROR "Trying to build module on a not supportd platform. Aborting.")
+  endif()
 
   build_library(${module}
     SHARED EMPTY_PREFIX
@@ -317,25 +358,6 @@ macro (build_module module)
     COMPILE_OPTIONS ${ARG_COMPILE_OPTIONS}
     VERSION ${ARG_VERSION}
     LINK_FLAGS ${ARG_LINK_FLAGS}
-  )
-
-  if (${CMAKE_SYSTEM_NAME} MATCHES Darwin)
-    set(LINK_FLAGS "-Wl,-undefined,dynamic_lookup")
-  elseif(${CMAKE_SYSTEM_NAME} MATCHES iOS)
-    set(LINK_FLAGS "-Wl,-undefined,dynamic_lookup")
-  elseif(${CMAKE_SYSTEM_NAME} MATCHES Linux)
-    set(LINK_FLAGS "-Wl,-unresolved-symbols=ignore-all")
-  elseif(${CMAKE_SYSTEM_NAME} MATCHES Windows)
-    set(LINK_FLAGS "/wd4275")
-  else()
-    message(FATAL_ERROR "Trying to build module on a not supportd platform. Aborting.")
-  endif()
-
-  set_target_properties(${module}.shared
-    PROPERTIES
-    LINKER_LANGUAGE C
-    PREFIX ""
-    LINK_FLAGS ${LINK_FLAGS}
   )
 
 endmacro(build_module)

@@ -26,7 +26,6 @@ find_path(HICNPLUGIN_INCLUDE_DIR vapi/hicn.api.vapi.h
   DOC "Find the hicn plugin includes"
 )
 
-
 set(HICNPLUGIN_INCLUDE_DIRS ${HICNPLUGIN_INCLUDE_DIR} ${HICNPLUGIN_INCLUDE_DIR}/vpp_plugins)
 
 include(FindPackageHandleStandardArgs)

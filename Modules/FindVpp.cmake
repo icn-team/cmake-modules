@@ -89,13 +89,12 @@ find_library(VPP_LIBRARY_VLIBMEMORY
 )
 
 execute_process(
-  COMMAND bash -xc "readlink ${VPP_LIBRARY_VNET} | awk -F. '{ printf(\"%s.%s\", \$(NF-1), \$(NF)) }'"
+  COMMAND bash -c "readlink ${VPP_LIBRARY_VNET} | grep '\\w.so.\\K\\d\*.\\d\*(.\\d\*)?' -oP"
   OUTPUT_VARIABLE VPP_VERSION
 )
 
 string(REPLACE "-" ";" VPP_VERSION ${VPP_VERSION})
 list (GET VPP_VERSION 0 VPP_VERSION)
-
 
 set(VPP_LIBRARIES ${VPP_LIBRARY_MEMORYCLIENT} ${VPP_LIBRARY_SVM} ${VPP_LIBRARY_INFRA} ${VPP_LIBRARY_VATPLUGIN} ${VPP_LIBRARY_VLIB} ${VPP_LIBRARY_VNET} ${VPP_LIBRARY_VAPICLIENT} ${VPP_LIBRARY_VLIBMEMORY})
 set(VPP_INCLUDE_DIRS ${VPP_INCLUDE_DIR} ${VPP_INCLUDE_DIR}/vpp_plugins)
