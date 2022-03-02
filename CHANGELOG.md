@@ -1,3 +1,13 @@
+## v1.3.0 (2022-03-02)
+
+### Feat
+
+- **cmake-modules**: update functions
+
+### Fix
+
+- **Modules/FindCiscoSafeC.cmake**: add path for searching includes safec
+
 ## v1.2.0 (2022-02-16)
 
 ### Feat
