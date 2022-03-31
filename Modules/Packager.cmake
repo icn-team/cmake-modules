@@ -68,16 +68,17 @@ function(make_packages)
     else()
       set(VERSION_REVISION "-${VERSION_REVISION}")
     endif()
-    if(PREFIX_VERSION)
-      set(tag "${PREFIX_VERSION}-${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}${RELEASE_CANDIDATE}${VERSION_REVISION}")
-    else()
-      set(tag "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}${RELEASE_CANDIDATE}${VERSION_REVISION}")
+
+    if (VERSION_PATCH)
+      set(VERSION_MINOR "${VERSION_MINOR}.")
     endif()
+
+    set(tag "${VERSION_MAJOR}.${VERSION_MINOR}${VERSION_PATCH}${RELEASE_CANDIDATE}${VERSION_REVISION}")
+
+    message(STATUS "Package version: ${tag}")
 
     set(deb_ver "${tag}")
     set(rpm_ver "${tag}")
-
-    message(STATUS "Version: ${deb_ver}")
 
     #get_next_version(${tag} next_version)
     set(next_version "${tag}")
