@@ -1,29 +1,22 @@
-## v1.3.0 (2022-03-02)
-
-### Feat
-
-- **cmake-modules**: update functions
+## v1.3.1 (2022-03-31)
 
 ### Fix
 
-- **Modules/FindCiscoSafeC.cmake**: add path for searching includes safec
+- **Packager.cmake**: fix version regex parsing
 
-## v1.2.0 (2022-02-16)
+## v1.3.0 (2022-03-25)
 
 ### Feat
 
+- add property 'OBJECT_LIBRARIES' to build_module macro
+- **cmake-modules**: update functions
 - add macros to retrieve CPU information
 
-## v1.1.3 (2022-02-14)
-
 ### Fix
 
+- set PRIVATE for compile options for test coverage
 - **gtest**: new gtest repo
 - do not retrieve VPP version by using package manager
-
-### Feat
-
-- add FindCiscoSafeC.cmake
 
 ## v1.1.2 (2021-12-09)
 
