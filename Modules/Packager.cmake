@@ -20,26 +20,33 @@ set(PACKAGE_MAINTAINER "ICN Team" CACHE STRING "Maintainer")
 set(PACKAGE_VENDOR "fd.io" CACHE STRING "Vendor")
 
 macro(extract_version)
-# Extract version from git
-  execute_process(
-    COMMAND git describe --long --match v*
-    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-    OUTPUT_VARIABLE VER
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-  )
+  # Extract version from git
+    execute_process(
+      COMMAND git describe --long --match v*
+      WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+      OUTPUT_VARIABLE VER
+      OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
 
-if (NOT VER)
-  set(VER "v2.10.0rc0-0-gbe4c28e3")
-endif()
-message(STATUS "Git describe output: ${VER}")
+  if (NOT VER)
+    set(VER "v2.10.0rc0-0-gbe4c28e3")
+  endif()
+  message(STATUS "Git describe output: ${VER}")
 
-string(REGEX REPLACE "v([0-9]+).([0-9]+).([0-9]+)(.*)?-([0-9]+)-(g[0-9a-f]+)" "\\1;\\2;\\3;\\4;\\5;\\6;" VER ${VER})
-list(GET VER 0 VERSION_MAJOR)
-list(GET VER 1 VERSION_MINOR)
-list(GET VER 2 VERSION_PATCH)
-list(GET VER 3 RELEASE_CANDIDATE)
-list(GET VER 4 VERSION_REVISION)
-list(GET VER 5 COMMIT_NAME)
+  string(REGEX MATCH "v([0-9]+).([0-9]+)(.[0-9]+)?(-.*)?-([0-9]+)-(g[0-9a-f]+)" VER ${VER})
+  set(VERSION_MAJOR ${CMAKE_MATCH_1})
+  set(VERSION_MINOR ${CMAKE_MATCH_2})
+  set(VERSION_PATCH ${CMAKE_MATCH_3})
+  set(RELEASE_CANDIDATE ${CMAKE_MATCH_4})
+  set(VERSION_REVISION ${CMAKE_MATCH_5})
+  set(COMMIT_NAME ${CMAKE_MATCH_6})
+
+  message(STATUS "Version major: ${VERSION_MAJOR}")
+  message(STATUS "Version minor: ${VERSION_MINOR}")
+  message(STATUS "Version patch: ${VERSION_PATCH}")
+  message(STATUS "Release candidate: ${RELEASE_CANDIDATE}")
+  message(STATUS "Version revision: ${VERSION_REVISION}")
+  message(STATUS "Commit hash: ${COMMIT_NAME}")
 endmacro(extract_version)
 
 function(make_packages)
@@ -55,13 +62,6 @@ function(make_packages)
     endforeach()
 
     extract_version()
-
-    message(STATUS "Version major: ${VERSION_MAJOR}")
-    message(STATUS "Version minor: ${VERSION_MINOR}")
-    message(STATUS "Version patch: ${VERSION_PATCH}")
-    message(STATUS "Release candidate: ${RELEASE_CANDIDATE}")
-    message(STATUS "Version revision: ${VERSION_REVISION}")
-    message(STATUS "Commit hash: ${COMMIT_NAME}")
 
     if (RELEASE_CANDIDATE STREQUAL "")
       set(VERSION_REVISION "")
