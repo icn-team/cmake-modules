@@ -27,7 +27,13 @@ include(IosMacros)
 include(FetchContent)
 extract_version()
 
-set(CURRENT_VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
+if (${VERSION_PATCH} STREQUAL "")
+  set(CURRENT_VERSION "${VERSION_MAJOR}.${VERSION_MINOR}")
+else()
+  set(CURRENT_VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
+endif()
+
+
 message(STATUS "${PROJECT_NAME} current version: ${CURRENT_VERSION}")
 
 set(DEFAULT_COMPILER_OPTIONS

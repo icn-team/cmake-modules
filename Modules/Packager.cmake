@@ -41,6 +41,8 @@ macro(extract_version)
   set(VERSION_REVISION ${CMAKE_MATCH_5})
   set(COMMIT_NAME ${CMAKE_MATCH_6})
 
+  string(REPLACE "." "" VERSION_PATCH ${VERSION_PATCH})
+
   message(STATUS "Version major: ${VERSION_MAJOR}")
   message(STATUS "Version minor: ${VERSION_MINOR}")
   message(STATUS "Version patch: ${VERSION_PATCH}")
@@ -69,7 +71,11 @@ function(make_packages)
       set(VERSION_REVISION "-${VERSION_REVISION}")
     endif()
 
-    set(tag "${VERSION_MAJOR}.${VERSION_MINOR}${VERSION_PATCH}${RELEASE_CANDIDATE}${VERSION_REVISION}")
+    if (${VERSION_PATCH} STREQUAL "")
+      set(tag "${VERSION_MAJOR}.${VERSION_MINOR}${RELEASE_CANDIDATE}${VERSION_REVISION}")
+    else()
+      set(tag "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}${RELEASE_CANDIDATE}${VERSION_REVISION}")
+    endif()
 
     message(STATUS "Package version: ${tag}")
 
