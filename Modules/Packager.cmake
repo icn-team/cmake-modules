@@ -69,10 +69,6 @@ function(make_packages)
       set(VERSION_REVISION "-${VERSION_REVISION}")
     endif()
 
-    if (VERSION_PATCH)
-      set(VERSION_MINOR "${VERSION_MINOR}.")
-    endif()
-
     set(tag "${VERSION_MAJOR}.${VERSION_MINOR}${VERSION_PATCH}${RELEASE_CANDIDATE}${VERSION_REVISION}")
 
     message(STATUS "Package version: ${tag}")
