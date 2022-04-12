@@ -33,8 +33,10 @@ else()
   set(CURRENT_VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
 endif()
 
-
 message(STATUS "${PROJECT_NAME} current version: ${CURRENT_VERSION}")
+
+# Generate compiler commands
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(DEFAULT_COMPILER_OPTIONS
   PRIVATE "-Wall" "-Werror"
