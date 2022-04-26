@@ -27,7 +27,7 @@ include(IosMacros)
 include(FetchContent)
 extract_version()
 
-if (${VERSION_PATCH} STREQUAL "")
+if ("${VERSION_PATCH}" STREQUAL "")
   set(CURRENT_VERSION "${VERSION_MAJOR}.${VERSION_MINOR}")
 else()
   set(CURRENT_VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
