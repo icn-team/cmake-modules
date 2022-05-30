@@ -33,7 +33,7 @@ macro(extract_version)
   endif()
   message(STATUS "Git describe output: ${VER}")
 
-  string(REGEX MATCH "v([0-9]+).([0-9]+)(.[0-9]+)?(-.*)?-([0-9]+)-(g[0-9a-f]+)" VER ${VER})
+  string(REGEX MATCH "v([0-9]+).([0-9]+)(.[0-9]+)?([-]?.*)?-([0-9]+)-(g[0-9a-f]+)" VER ${VER})
   set(VERSION_MAJOR ${CMAKE_MATCH_1})
   set(VERSION_MINOR ${CMAKE_MATCH_2})
   set(VERSION_PATCH ${CMAKE_MATCH_3})
