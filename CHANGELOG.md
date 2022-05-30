@@ -1,3 +1,18 @@
+## v1.3.2 (2022-05-30)
+
+### Fix
+
+- **PAckager.cmake**: wrong regex for version
+- add quptes for version string comparison
+- remove eventual dots in version component
+- correct version handling when minor is not present in tag
+- **Packager.cmake**: remove VERSION_PREFIX
+
+### Feat
+
+- add module to import unity test framework
+- add compilation commands to cmake output files by default
+
 ## v1.3.1 (2022-03-31)
 
 ### Fix
