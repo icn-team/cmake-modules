@@ -1,3 +1,9 @@
+## v1.3.3 (2022-06-01)
+
+### Feat
+
+- **Packager.cmake**: add version prefix (vpp version) to hicn packages
+
 ## v1.3.2 (2022-05-30)
 
 ### Fix
