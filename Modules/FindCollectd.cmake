@@ -31,7 +31,17 @@ find_path(COLLECTD_CONFIG_INCLUDE_DIR config.h
   DOC "Find the collectd includes"
 )
 
-message(STATUS ${COLLECTD_INCLUDE_DIR} ${COLLECTD_CONFIG_INCLUDE_DIR})
+# Find a plugin (e.g. "load.so") just to retrieve the parent folder;
+# that parent folder corresponds to the shared library folder (used to add new plugins)
+find_library(COLLECTD_LOAD_PLUGIN load.so
+  HINTS ${COLLECTD_SEARCH_PATH_LIST}
+  PATH_SUFFIXES lib/collectd/
+  DOC "Find the collectd plugin dir"
+  REQUIRED
+)
+get_filename_component(COLLECTD_PLUGIN_DIR ${COLLECTD_LOAD_PLUGIN} DIRECTORY)
+
+message(STATUS ${COLLECTD_INCLUDE_DIR} ${COLLECTD_CONFIG_INCLUDE_DIR} ${COLLECTD_PLUGIN_DIR})
 
 execute_process(
   COMMAND bash -c "dpkg -l | grep collectd-dev | awk '{print $3}'"
@@ -42,7 +52,7 @@ string(REPLACE "." ";" COLLECTD_VERSION ${COLLECTD_VERSION})
 list(GET COLLECTD_VERSION 0 COLLECTD_MAJOR)
 list(GET COLLECTD_VERSION 1 COLLECTD_MINOR)
 list(GET COLLECTD_VERSION 2 COLLECTD_PATCH)
-set(COLLECTD_VERSION "${COLLECTD_MAJOR}.%{COLLECTD_MINOR}.${COLLECTD_PATCH}")
+set(COLLECTD_VERSION "${COLLECTD_MAJOR}.${COLLECTD_MINOR}.${COLLECTD_PATCH}")
 set(COLLECTD_INCLUDE_DIRS ${COLLECTD_INCLUDE_DIR} ${COLLECTD_CONFIG_INCLUDE_DIR})
 
 include(FindPackageHandleStandardArgs)
