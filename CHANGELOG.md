@@ -1,3 +1,9 @@
+## v1.3.4 (2022-08-29)
+
+### Feat
+
+- **collectd**: retrieve plugin folder for collectd
+
 ## v1.3.3 (2022-06-01)
 
 ### Feat
@@ -6,6 +12,11 @@
 
 ## v1.3.2 (2022-05-30)
 
+### Feat
+
+- add module to import unity test framework
+- add compilation commands to cmake output files by default
+
 ### Fix
 
 - **PAckager.cmake**: wrong regex for version
@@ -13,11 +24,6 @@
 - remove eventual dots in version component
 - correct version handling when minor is not present in tag
 - **Packager.cmake**: remove VERSION_PREFIX
-
-### Feat
-
-- add module to import unity test framework
-- add compilation commands to cmake output files by default
 
 ## v1.3.1 (2022-03-31)
 
@@ -88,24 +94,24 @@
 
 ## v1.0.1 (2021-11-04)
 
-### Fix
-
-- **Packager.cmake**: correct generation packages
-
 ### Feat
 
 - **find<library>.cmake**: search exact version of packages in find<module>.cmake
 - **FindModernCppKafka.cmake**: add FindModernCppKafka.cmake module
 
+### Fix
+
+- **Packager.cmake**: correct generation packages
+
 ## v1.0.0 (2021-10-14)
-
-### Refactor
-
-- clean up cmake modules
 
 ### BREAKING CHANGE
 
 - Ref: SPT-690
 #promote MAJOR
+
+### Refactor
+
+- clean up cmake modules
 
 ## v0.0.1 (2021-10-13)
