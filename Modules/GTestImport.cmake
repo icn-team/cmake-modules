@@ -18,8 +18,9 @@ include(ExternalProject)
 ExternalProject_Add(gtest
   URL https://github.com/google/googletest/archive/refs/tags/release-1.12.1.zip
   PREFIX ${CMAKE_BINARY_DIR}/gtest
-  CONFIGURE_COMMAND
-    ${CMAKE_COMMAND} -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER} -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER} ${CMAKE_BINARY_DIR}/gtest/src/gtest
+  CMAKE_ARGS
+    -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
+    -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
   BUILD_BYPRODUCTS
     ${CMAKE_BINARY_DIR}/gtest/src/gtest-build/lib/libgmock_main.a
     ${CMAKE_BINARY_DIR}/gtest/src/gtest-build/lib/libgmock.a

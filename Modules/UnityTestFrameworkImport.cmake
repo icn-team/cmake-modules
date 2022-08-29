@@ -15,7 +15,11 @@ include(ExternalProject)
 ExternalProject_Add(unity
   URL https://github.com/ThrowTheSwitch/Unity/archive/refs/tags/v2.5.2.zip
   PREFIX ${CMAKE_BINARY_DIR}/unity
-  CMAKE_ARGS "-DUNITY_EXTENSION_FIXTURE=ON -DUNITY_EXTENSION_MEMORY=ON" 
+  CMAKE_ARGS
+    -DUNITY_EXTENSION_FIXTURE=ON
+    -DUNITY_EXTENSION_MEMORY=ON
+    -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
+    -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER} 
   BUILD_BYPRODUCTS
     ${CMAKE_BINARY_DIR}/unity/src/unity-build/libunity.a
   INSTALL_COMMAND ""
