@@ -73,7 +73,7 @@ function(make_packages)
       set(VERSION_REVISION "-${VERSION_REVISION}")
     endif()
 
-    if ("${VERSION_PATCH}" STREQUAL "")
+    if ("${VERSION_PATCH}" STREQUAL "" AND "${RELEASE_CANDIDATE}" STREQUAL "")
       set(tag "${VERSION_MAJOR}.${VERSION_MINOR}.0${RELEASE_CANDIDATE}${VERSION_REVISION}")
     else()
       if(PREFIX_VERSION)
