@@ -67,23 +67,18 @@ function(make_packages)
 
     extract_version()
 
-    if (RELEASE_CANDIDATE STREQUAL "")
-      set(VERSION_REVISION "")
-    else()
-      set(VERSION_REVISION "-${VERSION_REVISION}")
-    endif()
-
     if ("${VERSION_PATCH}" STREQUAL "")
       if ("${RELEASE_CANDIDATE}" STREQUAL "")
-        set(VERSION_PATCH ".0")
+        set(VERSION_PATCH ".${VERSION_REVISION}")
+        set(VERSION_REVISION "")
       endif()
     endif()
 
-    if(PREFIX_VERSION)
-      set(VERSION_MAJOR "${PREFIX_VERSION}-${VERSION_MAJOR}")
+    if (NOT "${VERSION_REVISION}" STREQUAL "")
+      set(VERSION_REVISION "-${VERSION_REVISION}")
     endif()
       
-    set(tag "${VERSION_MAJOR}.${VERSION_MINOR}${VERSION_PATCH}${RELEASE_CANDIDATE}")
+    set(tag "${VERSION_MAJOR}.${VERSION_MINOR}${VERSION_PATCH}${RELEASE_CANDIDATE}${VERSION_REVISION}")
 
     message(STATUS "Package version: ${tag}")
 
